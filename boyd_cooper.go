@@ -164,7 +164,6 @@ func bot(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if strings.Contains(m.Content, "Boyd") {
-		time.Sleep(5 * time.Second)
 		s.ChannelMessageSend(m.ChannelID, buildSentance(5, 5))
 	}
 	if strings.HasPrefix(m.Content, "!quoteadd ") {
