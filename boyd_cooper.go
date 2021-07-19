@@ -38,11 +38,11 @@ func buildSentance(asideChance uint32, interjectionChance uint32) string {
 	interjection := [15]string{"*chuckles*", "(Ho ho!)", "(Wait...)", "(Uh...)", "(Um...)", "*cough*", "(Uh...)", "(Hmm...)", "(Ha!)", "(Yeah, yeah, yeah...)", "(What?)", "(No, no, nonono...)", "(Okay, okay but...)", "(Huh?)", "(Oh-hoh, RIGHT...)"}
 
 	sentance := ""
-	if randGen.Uint32()%asideChance == (asideChance - 1) {
+	if randGen.Uint32()%asideChance == 0 {
 		sentance = aside[rand.Uint32()%2]
 		return sentance
 	}
-	if randGen.Uint32()%interjectionChance == (interjectionChance - 1) {
+	if randGen.Uint32()%interjectionChance == 0 {
 		sentance = interjection[rand.Uint32()%15]
 		return sentance
 	}
