@@ -14,7 +14,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var Token string = ""
+var Token string = "ODI2NDk1Nzg3MjQwMzkwNzI3.YGNULw.uczBxUw6gqWxg46qT8A7g0GxOI0"
 
 var quoteList []string
 var quoteIndex map[string][]string
@@ -56,23 +56,24 @@ func buildSentance(asideChance uint32, interjectionChance uint32) string {
 	return sentance
 }
 
+var punct = regexp.MustCompile("[[:punct:]]")
+
 func buildIndex() {
+	fmt.Println("Building quote index...")
 	quoteIndex = make(map[string][]string)
 
-	re := regexp.MustCompile("[[:punct:]]")
-
 	for _, quote := range quoteList {
-		// Removes all punctuation from string to make a more human friendly index
-		filtered := re.ReplaceAllString(quote, "")
-
-		for _, word := range strings.Split(filtered, " ") {
-			quoteIndex[word] = append(quoteIndex[word], quote)
-		}
+		addToIndex(quote)
 	}
+
+	fmt.Println("Built index!")
 }
 
 func addToIndex(quote string) {
-	for _, word := range strings.Split(quote, " ") {
+	// Removes all punctuation from string to make a more human friendly index
+	filtered := punct.ReplaceAllString(quote, "")
+
+	for _, word := range strings.Split(filtered, " ") {
 		quoteIndex[word] = append(quoteIndex[word], quote)
 	}
 }
