@@ -17,6 +17,7 @@ import (
 var Token string = ""
 
 var quoteList []string
+var quoteIndex map[string][]string
 var quotesFile *os.File
 
 var randGen *rand.Rand
@@ -53,6 +54,28 @@ func buildSentance(asideChance uint32, interjectionChance uint32) string {
 		sentance = subjects[rand.Uint32()%40] + " " + subjectConnector[rand.Uint32()%8] + " " + subjects[rand.Uint32()%39] + " " + intransitiveVerb[rand.Uint32()%17] + " " + preposition[rand.Uint32()%7] + " " + object[rand.Uint32()%17]
 	}
 	return sentance
+}
+
+var punct = regexp.MustCompile("[[:punct:]]")
+
+func buildIndex() {
+	fmt.Println("Building quote index...")
+	quoteIndex = make(map[string][]string)
+
+	for _, quote := range quoteList {
+		addToIndex(quote)
+	}
+
+	fmt.Println("Built index!")
+}
+
+func addToIndex(quote string) {
+	// Removes all punctuation from string to make a more human friendly index
+	filtered := punct.ReplaceAllString(quote, "")
+
+	for _, word := range strings.Split(filtered, " ") {
+		quoteIndex[word] = append(quoteIndex[word], quote)
+	}
 }
 
 func filter(array []string, f func(string) bool) []string {
@@ -96,9 +119,36 @@ func getSearchQuote(search string) string {
 		return "Error compiling pattern: " + err.Error()
 	}
 
-	filteredQuotes := filter(quoteList, func(str string) bool {
-		return re.FindStringSubmatch(str) != nil
-	})
+	// get the first word in search so we can look it up in the index to speed up search time
+	var word = search
+	for i, v := range search {
+		if v == ' ' {
+			word = search[0:i]
+			break
+		}
+	}
+
+	filteredQuotes := quoteIndex[word]
+
+	if len(filteredQuotes) == 0 {
+		// if we didn't find anything in the index we might still have a regex
+		// in this case search the whole database
+		fmt.Printf("\"%s\" not found in index, filtering all %d quotes\n", word, len(quoteList))
+		filteredQuotes = filter(quoteList, func(str string) bool {
+			return re.FindStringSubmatch(str) != nil
+		})
+	} else {
+		// if the "first word" is not the entire search string then the index probably
+		// included results we were not looking for and we have to filter these off
+		if word != search {
+			fmt.Printf("\"%s\" found in index, filtering %d quotes\n", word, len(filteredQuotes))
+			filteredQuotes = filter(filteredQuotes, func(str string) bool {
+				return re.FindStringSubmatch(str) != nil
+			})
+		} else {
+			fmt.Printf("\"%s\" found in index, %d perfect matches\n", word, len(filteredQuotes))
+		}
+	}
 
 	fmt.Printf("Fresh search made %d matches\n", len(filteredQuotes))
 
@@ -170,13 +220,18 @@ func bot(s *discordgo.Session, m *discordgo.MessageCreate) {
 		res := stripPrefix("!quoteadd ", m.Content)
 		fmt.Println("Adding quote: " + res)
 		writeQuote(res)
+		addToIndex(res)
 		quoteList = append(quoteList, res)
 		s.ChannelMessageSend(m.ChannelID, "Added!")
+	} else if strings.HasPrefix(m.Content, "!quotes") {
+		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("There are %d quotes in my database", len(quoteList)))
 	} else if strings.HasPrefix(m.Content, "!quote") {
 		res := stripPrefix("!quote", m.Content)
 		searchMsg := stripPrefix(" ", res)
 		ret := getSearchQuote(searchMsg)
 		s.ChannelMessageSend(m.ChannelID, ret)
+	} else if strings.HasPrefix(m.Content, "!help") {
+		s.ChannelMessageSend(m.ChannelID, "`!quote` shows a random quote\n`!quote PATTERN` finds a quote that has a substring matching PATTERN\n`!quoteadd` adds a new quote to the database\n`!help` shows this help message")
 	}
 }
 
@@ -188,6 +243,7 @@ func main() {
 	}
 
 	loadQuotes("./quotes.txt")
+	buildIndex()
 
 	quotesFile, err = os.OpenFile("./quotes.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
