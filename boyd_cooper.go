@@ -14,7 +14,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var Token string = "ODI2NDk1Nzg3MjQwMzkwNzI3.YGNULw.uczBxUw6gqWxg46qT8A7g0GxOI0"
+var Token string = ""
 
 var quoteList []string
 var quoteIndex map[string][]string
