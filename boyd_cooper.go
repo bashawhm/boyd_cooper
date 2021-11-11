@@ -12,9 +12,8 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 )
-
-var Token string = ""
 
 var quoteList []string
 var quoteIndex map[string][]string
@@ -237,7 +236,16 @@ func bot(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 func main() {
 	randGen = rand.New(rand.NewSource(time.Now().UnixNano()))
-	ds, err := discordgo.New("Bot " + Token)
+
+	// Read discord token from .env file
+	godotenv.Load()
+	token := os.Getenv("TOKEN")
+
+	if token == "" {
+		panic("missing enviroment variable for TOKEN")
+	}
+
+	ds, err := discordgo.New("Bot " + token)
 	if err != nil {
 		panic("failed to create session")
 	}
@@ -260,10 +268,9 @@ func main() {
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Boyd is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
 
 	// Cleanly close down the Discord session.
 	ds.Close()
-
 }
