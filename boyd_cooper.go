@@ -232,7 +232,7 @@ func bot(s *discordgo.Session, m *discordgo.MessageCreate) {
 		ret := getSearchQuote(searchMsg)
 		s.ChannelMessageSend(m.ChannelID, ret)
 	} else if strings.HasPrefix(m.Content, "!help") {
-		s.ChannelMessageSend(m.ChannelID, "`!quote` shows a random quote\n`!quote PATTERN` finds a quote that has a substring matching PATTERN\n`!quoteadd` adds a new quote to the database\n`!help` shows this help message")
+		s.ChannelMessageSend(m.ChannelID, "`!quote` shows a random quote\n`!quote PATTERN` finds a quote that has a substring matching PATTERN\n`!quoteadd` adds a new quote to the database\n`!help` shows this help message\n\nSource: https://github.com/bashawhm/boyd_cooper/")
 	}
 }
 
