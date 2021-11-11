@@ -62,6 +62,7 @@ func buildIndex() {
 	quoteIndex = make(map[string][]string)
 
 	for _, quote := range quoteList {
+		quote = strings.ToLower(quote)
 		addToIndex(quote)
 	}
 
@@ -73,6 +74,7 @@ func addToIndex(quote string) {
 	filtered := punct.ReplaceAllString(quote, "")
 
 	for _, word := range strings.Split(filtered, " ") {
+		word = strings.ToLower(word)
 		quoteIndex[word] = append(quoteIndex[word], quote)
 	}
 }
@@ -187,7 +189,7 @@ func loadQuotes(fileName string) {
 	fin := bufio.NewScanner(bufio.NewReader(file))
 	fin.Split(bufio.ScanLines)
 	for fin.Scan() {
-		quoteList = append(quoteList, fin.Text())
+		quoteList = append(quoteList, strings.ToLower(fin.Text()))
 	}
 	file.Close()
 }
@@ -220,13 +222,13 @@ func bot(s *discordgo.Session, m *discordgo.MessageCreate) {
 		fmt.Println("Adding quote: " + res)
 		writeQuote(res)
 		addToIndex(res)
-		quoteList = append(quoteList, res)
+		quoteList = append(quoteList, strings.ToLower(res))
 		s.ChannelMessageSend(m.ChannelID, "Added!")
 	} else if strings.HasPrefix(m.Content, "!quotes") {
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("There are %d quotes in my database", len(quoteList)))
 	} else if strings.HasPrefix(m.Content, "!quote") {
 		res := stripPrefix("!quote", m.Content)
-		searchMsg := stripPrefix(" ", res)
+		searchMsg := strings.ToLower(stripPrefix(" ", res))
 		ret := getSearchQuote(searchMsg)
 		s.ChannelMessageSend(m.ChannelID, ret)
 	} else if strings.HasPrefix(m.Content, "!help") {
