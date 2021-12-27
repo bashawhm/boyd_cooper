@@ -12,9 +12,8 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 )
-
-var Token string = ""
 
 var quoteList []string
 var quoteIndex map[string][]string
@@ -63,6 +62,7 @@ func buildIndex() {
 	quoteIndex = make(map[string][]string)
 
 	for _, quote := range quoteList {
+		quote = strings.ToLower(quote)
 		addToIndex(quote)
 	}
 
@@ -74,6 +74,7 @@ func addToIndex(quote string) {
 	filtered := punct.ReplaceAllString(quote, "")
 
 	for _, word := range strings.Split(filtered, " ") {
+		word = strings.ToLower(word)
 		quoteIndex[word] = append(quoteIndex[word], quote)
 	}
 }
@@ -188,7 +189,7 @@ func loadQuotes(fileName string) {
 	fin := bufio.NewScanner(bufio.NewReader(file))
 	fin.Split(bufio.ScanLines)
 	for fin.Scan() {
-		quoteList = append(quoteList, fin.Text())
+		quoteList = append(quoteList, strings.ToLower(fin.Text()))
 	}
 	file.Close()
 }
@@ -221,23 +222,32 @@ func bot(s *discordgo.Session, m *discordgo.MessageCreate) {
 		fmt.Println("Adding quote: " + res)
 		writeQuote(res)
 		addToIndex(res)
-		quoteList = append(quoteList, res)
+		quoteList = append(quoteList, strings.ToLower(res))
 		s.ChannelMessageSend(m.ChannelID, "Added!")
 	} else if strings.HasPrefix(m.Content, "!quotes") {
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("There are %d quotes in my database", len(quoteList)))
 	} else if strings.HasPrefix(m.Content, "!quote") {
 		res := stripPrefix("!quote", m.Content)
-		searchMsg := stripPrefix(" ", res)
+		searchMsg := strings.ToLower(stripPrefix(" ", res))
 		ret := getSearchQuote(searchMsg)
 		s.ChannelMessageSend(m.ChannelID, ret)
 	} else if strings.HasPrefix(m.Content, "!help") {
-		s.ChannelMessageSend(m.ChannelID, "`!quote` shows a random quote\n`!quote PATTERN` finds a quote that has a substring matching PATTERN\n`!quoteadd` adds a new quote to the database\n`!help` shows this help message")
+		s.ChannelMessageSend(m.ChannelID, "`!quote` shows a random quote\n`!quote PATTERN` finds a quote that has a substring matching PATTERN\n`!quoteadd` adds a new quote to the database\n`!help` shows this help message\n\nSource: https://github.com/bashawhm/boyd_cooper/")
 	}
 }
 
 func main() {
 	randGen = rand.New(rand.NewSource(time.Now().UnixNano()))
-	ds, err := discordgo.New("Bot " + Token)
+
+	// Read discord token from .env file
+	godotenv.Load()
+	token := os.Getenv("TOKEN")
+
+	if token == "" {
+		panic("missing enviroment variable for TOKEN")
+	}
+
+	ds, err := discordgo.New("Bot " + token)
 	if err != nil {
 		panic("failed to create session")
 	}
@@ -260,10 +270,9 @@ func main() {
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Boyd is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
 
 	// Cleanly close down the Discord session.
 	ds.Close()
-
 }
