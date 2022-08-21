@@ -49,7 +49,10 @@ func search(s string) (string, *searchError) {
 
 	fmt.Println("Starting new search")
 
-	newSearch(s, 0)
+	err := newSearch(s, 0)
+	if err != nil {
+		return "", err
+	}
 
 	searchLock.Lock()
 	ret := searches[s].Next()
