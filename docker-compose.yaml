@@ -2,9 +2,3 @@ services:
   bot:
     build: .
     env_file: .env
-  nginx:
-    image: nginx
-    ports:
-        - 8006:80
-    volumes:
-      - ./quotes.txt:/usr/share/nginx/html/quotes.txt
