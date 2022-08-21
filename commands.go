@@ -94,7 +94,7 @@ var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 
 		if err != nil {
 			if err.compileFailed != nil {
-				message := fmt.Sprintf("You tried to use a regex to solve a problem and now you have 2 problems.\n```%s```\nhttps://regex101.com/", err.compileFailed)
+				message := fmt.Sprintf("You tried to use a regex to solve a problem and now you have 2 problems.\n```\n%s\n```", err.compileFailed)
 				sendMessage(s, d, message)
 				return
 			}
