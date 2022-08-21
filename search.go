@@ -83,7 +83,7 @@ func newSearch(s string, start int) *searchError {
 	quotes := make([]int, 0)
 	for i, q := range quoteList[start:] {
 		if re.FindStringSubmatch(q) != nil {
-			quotes = append(quotes, start + i)
+			quotes = append(quotes, start+i)
 		}
 	}
 

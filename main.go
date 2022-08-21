@@ -77,7 +77,7 @@ func main() {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 	fmt.Println("Memory usage:", m.Alloc/1024, "KB")
-	
+
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	<-make(chan struct{})
