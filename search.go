@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-var searchLock = sync.Mutex{}
+var searchLock = sync.RWMutex{}
 var searches map[string]*Result
 
 type Result struct {
@@ -34,28 +34,40 @@ func init() {
 
 // If the search is already in progress return the next quote, otherwise start a new search.
 func search(s string) (string, *searchError) {
-	searchLock.Lock()
-	defer searchLock.Unlock()
 
 	fmt.Println("Searching for", s)
 
+	searchLock.Lock()
 	r, ok := searches[s]
 	if ok && r.index < len(r.quotes) {
 		fmt.Println("Returning cached result")
-		return r.Next(), nil
+		ret := r.Next()
+		searchLock.Unlock()
+		return ret, nil
 	}
+	searchLock.Unlock()
 
 	fmt.Println("Starting new search")
 
 	newSearch(s, 0)
 
-	// Return the first result
-	return searches[s].Next(), nil
+	searchLock.Lock()
+	ret := searches[s].Next()
+	searchLock.Unlock()
+
+	return ret, nil
 }
 
 // Starts a new search for a given regex
 // Pass in a starting index to start the search from a specific quote, helpful for indexing
 func newSearch(s string, start int) *searchError {
+	searchLock.RLock()
+	if _, ok := searches[s]; ok {
+		searchLock.RUnlock()
+		return nil
+	}
+	searchLock.RUnlock()
+
 	// WARNING: This is normally a DOS security risk.
 	// However, since this bot is only accessible by our community and access is public we will trust our users.
 	re, err := regexp.Compile(s)
@@ -83,7 +95,9 @@ func newSearch(s string, start int) *searchError {
 	})
 
 	// Save the result
+	searchLock.Lock()
 	searches[s] = &Result{re, quotes, 0}
+	searchLock.Unlock()
 
 	return nil
 }
@@ -105,7 +119,6 @@ func updateSearches(q string) {
 func indexQuotes() {
 	fmt.Println("Indexing quotes...")
 
-	searchLock.Lock()
 	for i, q := range quoteList {
 		// Split the quote into words
 		words := regexp.MustCompile(`\W+`).Split(q, -1)
@@ -113,12 +126,13 @@ func indexQuotes() {
 		// Start a new search for each word
 		for _, w := range words {
 			w = strings.ToLower(w)
+
+			// TODO: Multithread this call
 			newSearch(fmt.Sprintf(`(?i)\b%s\b`, w), i)
 		}
 	}
 
 	fmt.Println("Indexed", len(searches), "words")
-	searchLock.Unlock()
 }
 
 type searchError struct {

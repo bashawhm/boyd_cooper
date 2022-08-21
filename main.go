@@ -42,6 +42,8 @@ func main() {
 	indexQuotes()
 	newSearch(".*", 0)
 
+	runtime.GC()
+
 	// Setup discord event handlers
 	ch := make(chan struct{})
 	session.AddHandler(func(s *discordgo.Session, event *discordgo.Ready) {
