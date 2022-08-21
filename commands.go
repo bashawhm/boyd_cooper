@@ -67,7 +67,7 @@ var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 	"quote": func(s *discordgo.Session, d *discordgo.InteractionCreate) {
 		var regex string
 		if len(d.ApplicationCommandData().Options) == 0 {
-			regex = ".*"
+			regex = "."
 		} else {
 			espaced := regexp.QuoteMeta(d.ApplicationCommandData().Options[0].StringValue())
 			regex = fmt.Sprintf("(?i)\\b%s\\b", espaced)
