@@ -74,7 +74,6 @@ var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 		}
 
 		q, err := search(regex)
-
 		if err != nil {
 			if err.compileFailed != nil {
 				message := fmt.Sprintf("You tried to use a regex to solve a problem and now you have 2 problems.\n```%s```\nhttps://regex101.com/", err.compileFailed)
@@ -92,11 +91,21 @@ var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 	},
 	"regex": func(s *discordgo.Session, d *discordgo.InteractionCreate) {
 		q, err := search(d.ApplicationCommandData().Options[0].StringValue())
+
 		if err != nil {
-			sendError(s, d, err)
-		} else {
-			sendMessage(s, d, quoteString(q))
+			if err.compileFailed != nil {
+				message := fmt.Sprintf("You tried to use a regex to solve a problem and now you have 2 problems.\n```%s```\nhttps://regex101.com/", err.compileFailed)
+				sendMessage(s, d, message)
+				return
+			}
+
+			if err.searchFailed != nil {
+				sendError(s, d, err.searchFailed)
+				return
+			}
 		}
+
+		sendMessage(s, d, quoteString(q))
 	},
 	"add": func(s *discordgo.Session, d *discordgo.InteractionCreate) {
 		quote := d.ApplicationCommandData().Options[0].StringValue()
