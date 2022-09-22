@@ -25,6 +25,6 @@ func loadQuotes() {
 
 // Saves a quote to the database
 func writeQuote(quote string) error {
-	_, err := quoteFile.WriteString(quote)
+	_, err := quoteFile.WriteString(quote + "\n")
 	return err
 }
