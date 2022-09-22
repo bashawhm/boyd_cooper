@@ -131,6 +131,7 @@ var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 			return
 		}
 		updateSearches(quote)
+		quoteList = append(quoteList, quote)
 		sendMessage(s, d, fmt.Sprintf("Added!\n%s", quoteString(quote)))
 	},
 	"quotes": func(s *discordgo.Session, d *discordgo.InteractionCreate) {
