@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"runtime"
 
@@ -10,22 +10,22 @@ import (
 )
 
 func main() {
-	fmt.Println("Starting BoydBot...")
+	log.Println("Starting BoydBot...")
 	if err := godotenv.Load(); err != nil {
-		fmt.Println("Error loading .env file")
+		log.Println("Error loading .env file")
 	}
 
 	// Get the bot token from the environment
 	token := os.Getenv("DISCORD_TOKEN")
 	if token == "" {
-		fmt.Println("DISCORD_TOKEN missing from .env file")
+		log.Println("DISCORD_TOKEN missing from .env file")
 		return
 	}
 
 	// Create a new Discord session using the provided bot token.
 	session, err := discordgo.New("Bot " + token)
 	if err != nil {
-		fmt.Println("Error creating Discord session: ", err)
+		log.Println("Error creating Discord session: ", err)
 		return
 	}
 
@@ -47,13 +47,13 @@ func main() {
 	// Setup discord event handlers
 	ch := make(chan struct{})
 	session.AddHandler(func(s *discordgo.Session, event *discordgo.Ready) {
-		fmt.Println("Bot is ready.")
+		log.Println("Bot is ready.")
 		ch <- struct{}{}
 	})
 
 	err = session.Open()
 	if err != nil {
-		fmt.Println("Error opening Discord session: ", err)
+		log.Println("Error opening Discord session: ", err)
 		return
 	}
 
@@ -70,15 +70,15 @@ func main() {
 	// Update the bot's interactions
 	_, err = session.ApplicationCommandBulkOverwrite(session.State.User.ID, "586678438656475156", commands)
 	if err != nil {
-		fmt.Println("Error overwriting commands: ", err)
+		log.Println("Error overwriting commands: ", err)
 	}
 
 	// Print memory usage
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-	fmt.Println("Memory usage:", m.Alloc/1024, "KB")
+	log.Println("Memory usage:", m.Alloc/1024, "KB")
 
 	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
+	log.Println("Bot is now running.  Press CTRL-C to exit.")
 	<-make(chan struct{})
 }

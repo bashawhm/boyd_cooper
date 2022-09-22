@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 
@@ -61,10 +62,12 @@ var commands = []*discordgo.ApplicationCommand{
 
 var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate){
 	"conspiracy": func(s *discordgo.Session, d *discordgo.InteractionCreate) {
+		log.Println("\\conspiracy")
 		sentence := buildSentence(5, 5)
 		sendMessage(s, d, sentence)
 	},
 	"quote": func(s *discordgo.Session, d *discordgo.InteractionCreate) {
+
 		var regex string
 		if len(d.ApplicationCommandData().Options) == 0 {
 			regex = "."
@@ -72,6 +75,7 @@ var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 			espaced := regexp.QuoteMeta(d.ApplicationCommandData().Options[0].StringValue())
 			regex = fmt.Sprintf("(?i)\\b%s\\b", espaced)
 		}
+		log.Println("\\quote", regex)
 
 		q, err := search(regex)
 		if err != nil {
@@ -90,7 +94,10 @@ var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 		sendMessage(s, d, quoteString(q))
 	},
 	"regex": func(s *discordgo.Session, d *discordgo.InteractionCreate) {
-		q, err := search(d.ApplicationCommandData().Options[0].StringValue())
+		input := d.ApplicationCommandData().Options[0].StringValue()
+		log.Println("\\regex", input)
+
+		q, err := search(input)
 
 		if err != nil {
 			if err.compileFailed != nil {
@@ -110,6 +117,8 @@ var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 	"add": func(s *discordgo.Session, d *discordgo.InteractionCreate) {
 		quote := d.ApplicationCommandData().Options[0].StringValue()
 
+		log.Println("\add", quote)
+
 		// The quote must not contain newlines
 		if len(strings.Split(quote, "\n")) != 1 {
 			sendError(s, d, fmt.Errorf("quote must not contain newlines"))
@@ -125,9 +134,11 @@ var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 		sendMessage(s, d, fmt.Sprintf("Added!\n%s", quoteString(quote)))
 	},
 	"quotes": func(s *discordgo.Session, d *discordgo.InteractionCreate) {
+		log.Println("\\quotes")
 		sendMessage(s, d, fmt.Sprintf("There are %d quotes in the database", len(quoteList)))
 	},
 	"source": func(s *discordgo.Session, d *discordgo.InteractionCreate) {
+		log.Println("\\source")
 		sendMessage(s, d, "https://github.com/bashawhm/boyd_cooper")
 	},
 }
@@ -146,7 +157,7 @@ func sendMessage(s *discordgo.Session, i *discordgo.InteractionCreate, content s
 	})
 
 	if err != nil {
-		fmt.Println("Error responding to interaction: ", err)
+		log.Println("Error responding to interaction: ", err)
 	}
 }
 
@@ -159,6 +170,6 @@ func sendError(s *discordgo.Session, i *discordgo.InteractionCreate, e error) {
 	})
 
 	if err != nil {
-		fmt.Println("Error responding to interaction: ", err)
+		log.Println("Error responding to interaction: ", err)
 	}
 }

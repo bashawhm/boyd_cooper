@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"regexp"
 	"strings"
@@ -35,19 +36,19 @@ func init() {
 // If the search is already in progress return the next quote, otherwise start a new search.
 func search(s string) (string, *searchError) {
 
-	fmt.Println("Searching for", s)
+	log.Println("Searching for", s)
 
 	searchLock.Lock()
 	r, ok := searches[s]
 	if ok && r.index < len(r.quotes) {
-		fmt.Println("Returning cached result")
+		log.Println("Returning cached result")
 		ret := r.Next()
 		searchLock.Unlock()
 		return ret, nil
 	}
 	searchLock.Unlock()
 
-	fmt.Println("Starting new search")
+	log.Println("Starting new search")
 
 	err := newSearch(s, 0)
 	if err != nil {
@@ -120,7 +121,7 @@ func updateSearches(q string) {
 
 // Starts a new search for every word found in the quote list
 func indexQuotes() {
-	fmt.Println("Indexing quotes...")
+	log.Println("Indexing quotes...")
 
 	for i, q := range quoteList {
 		// Split the quote into words
@@ -135,7 +136,7 @@ func indexQuotes() {
 		}
 	}
 
-	fmt.Println("Indexed", len(searches), "words")
+	log.Println("Indexed", len(searches), "words")
 }
 
 type searchError struct {

@@ -2,7 +2,7 @@ package main
 
 import (
 	"bufio"
-	"fmt"
+	"log"
 	"os"
 )
 
@@ -11,7 +11,7 @@ var quoteFile *os.File
 
 // Loads the quote list from a file
 func loadQuotes() {
-	fmt.Println("Loading quotes...")
+	log.Println("Loading quotes...")
 	searchLock.Lock()
 	quoteList = make([]string, 0)
 
@@ -20,7 +20,7 @@ func loadQuotes() {
 		quoteList = append(quoteList, scanner.Text())
 	}
 	searchLock.Unlock()
-	fmt.Println("Loaded", len(quoteList), "quotes")
+	log.Println("Loaded", len(quoteList), "quotes")
 }
 
 // Saves a quote to the database
