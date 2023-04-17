@@ -12,14 +12,12 @@ var quoteFile *os.File
 // Loads the quote list from a file
 func loadQuotes() {
 	log.Println("Loading quotes...")
-	searchLock.Lock()
 	quoteList = make([]string, 0)
 
 	scanner := bufio.NewScanner(bufio.NewReader(quoteFile))
 	for scanner.Scan() {
 		quoteList = append(quoteList, scanner.Text())
 	}
-	searchLock.Unlock()
 	log.Println("Loaded", len(quoteList), "quotes")
 }
 
