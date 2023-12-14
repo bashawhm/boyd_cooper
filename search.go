@@ -112,7 +112,6 @@ func newSearchLocked(s string, start int) *searchError {
 
 	// Save the result
 	searches[s] = &Result{re, quotes, 0}
-
 	return nil
 }
 

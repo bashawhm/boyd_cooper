@@ -40,7 +40,8 @@ func main() {
 
 	// Index quotes
 	indexQuotes()
-	newSearch(".*", 0)
+	err = newSearch(".*", 0)
+	log.Println("Indexed", len(searches[".*"].quotes), "quotes")
 
 	runtime.GC()
 
