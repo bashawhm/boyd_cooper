@@ -12,12 +12,14 @@ import (
 var searchesLock = sync.Mutex{}
 var searches map[string]*Result
 
+// Result is a struct that holds the results of a search.
 type Result struct {
 	re     *regexp.Regexp
 	quotes []int
 	index  int
 }
 
+// Next returns the next quote in the search results.
 func (r *Result) Next() string {
 	if r.index >= len(r.quotes) {
 		return ""
@@ -51,17 +53,17 @@ func search(s string) (string, *searchError) {
 
 		ret := r.Next()
 		return ret, nil
-	} else {
-		log.Println("Starting new search")
-
-		err := newSearchLocked(s, 0)
-		if err != nil {
-			return "", err
-		}
-
-		ret := searches[s].Next()
-		return ret, nil
 	}
+
+	log.Println("Starting new search")
+
+	err := newSearchLocked(s, 0)
+	if err != nil {
+		return "", err
+	}
+
+	ret := searches[s].Next()
+	return ret, nil
 }
 
 // Starts a new search for a given regex.

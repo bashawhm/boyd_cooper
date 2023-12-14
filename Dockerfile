@@ -6,7 +6,7 @@ COPY . /app
 
 WORKDIR /app
 
-RUN go build
+RUN go build -v
 
 # Run the server executable
 CMD [ "/app/boyd_cooper" ]
