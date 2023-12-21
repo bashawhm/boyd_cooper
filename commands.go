@@ -125,7 +125,7 @@ var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 			return
 		}
 
-		err := writeQuote(quote)
+		err := writeQuote(quoteFile, quote)
 		if err != nil {
 			sendError(s, d, err)
 			return

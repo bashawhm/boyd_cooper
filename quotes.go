@@ -2,27 +2,23 @@ package main
 
 import (
 	"bufio"
-	"log"
-	"os"
+	"io"
 )
 
 var quoteList []string
-var quoteFile *os.File
 
-// Loads the quote list from a file
-func loadQuotes() {
-	log.Println("Loading quotes...")
+// Loads the quote list from an input stream
+func loadQuotes(input io.Reader) {
 	quoteList = make([]string, 0)
 
-	scanner := bufio.NewScanner(bufio.NewReader(quoteFile))
+	scanner := bufio.NewScanner(bufio.NewReader(input))
 	for scanner.Scan() {
 		quoteList = append(quoteList, scanner.Text())
 	}
-	log.Println("Loaded", len(quoteList), "quotes")
 }
 
-// Saves a quote to the database
-func writeQuote(quote string) error {
-	_, err := quoteFile.WriteString(quote + "\n")
+// Writes a quote to an output stream
+func writeQuote(output io.Writer, quote string) error {
+	_, err := output.Write([]byte(quote + "\n"))
 	return err
 }
