@@ -117,7 +117,7 @@ var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 	"add": func(s *discordgo.Session, d *discordgo.InteractionCreate) {
 		quote := d.ApplicationCommandData().Options[0].StringValue()
 
-		log.Println("\add", quote)
+		log.Println("\\add", quote)
 
 		// The quote must not contain newlines
 		if len(strings.Split(quote, "\n")) != 1 {
@@ -127,9 +127,11 @@ var handlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate)
 
 		err := writeQuote(quote)
 		if err != nil {
+			log.Println("Error writing quote: ", err)
 			sendError(s, d, err)
 			return
 		}
+
 		updateSearches(quote)
 		quoteList = append(quoteList, quote)
 		sendMessage(s, d, fmt.Sprintf("Added!\n%s", quoteString(quote)))
