@@ -32,7 +32,7 @@ func main() {
 	}
 
 	// open the quotes file
-	quoteFile, err := os.OpenFile("quotes.txt", os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
+	quoteFile, err = os.OpenFile("quotes.txt", os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
 	}
