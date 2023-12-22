@@ -9,6 +9,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
+var quoteFile *os.File
+
 func main() {
 	log.Println("Starting BoydBot...")
 	if err := godotenv.Load(); err != nil {
@@ -30,13 +32,16 @@ func main() {
 	}
 
 	// open the quotes file
-	quoteFile, err = os.OpenFile("quotes.txt", os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
+	quoteFile, err := os.OpenFile("quotes.txt", os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
 	}
+	defer quoteFile.Close()
 
 	// Load the quotes
-	loadQuotes()
+	log.Println("Loading quotes...")
+	loadQuotes(quoteFile)
+	log.Println("Loaded", len(quoteList), "quotes")
 
 	// Index quotes
 	indexQuotes()

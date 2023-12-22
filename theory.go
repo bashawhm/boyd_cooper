@@ -23,21 +23,13 @@ func buildSentence(asideChance uint32, interjectionChance uint32) string {
 	aside := [2]string{"Visiting hours are over!", "Why does that hydrant keep looking at me?"}
 	interjection := [15]string{"*chuckles*", "(Ho ho!)", "(Wait...)", "(Uh...)", "(Um...)", "*cough*", "(Uh...)", "(Hmm...)", "(Ha!)", "(Yeah, yeah, yeah...)", "(What?)", "(No, no, nonono...)", "(Okay, okay but...)", "(Huh?)", "(Oh-hoh, RIGHT...)"}
 
-	sentence := ""
 	if randGen.Uint32()%asideChance == 0 {
-		sentence = aside[rand.Uint32()%2]
-		return sentence
-	}
-	if randGen.Uint32()%interjectionChance == 0 {
-		sentence = interjection[rand.Uint32()%15]
-		return sentence
-	}
-
-	if randGen.Int()%2 == 0 {
-		sentence = subjects[rand.Int()%40] + " " + transitiveVerb[rand.Int()%12] + " " + object[rand.Int()%17] + " " + conclution[rand.Int()%9]
+		return aside[rand.Uint32()%2]
+	} else if randGen.Uint32()%interjectionChance == 0 {
+		return interjection[rand.Uint32()%15]
+	} else if randGen.Int()%2 == 0 {
+		return subjects[rand.Int()%40] + " " + transitiveVerb[rand.Int()%12] + " " + object[rand.Int()%17] + " " + conclution[rand.Int()%9]
 	} else {
-		sentence = subjects[rand.Uint32()%40] + " " + subjectConnector[rand.Uint32()%8] + " " + subjects[rand.Uint32()%39] + " " + intransitiveVerb[rand.Uint32()%17] + " " + preposition[rand.Uint32()%7] + " " + object[rand.Uint32()%17]
+		return subjects[rand.Uint32()%40] + " " + subjectConnector[rand.Uint32()%8] + " " + subjects[rand.Uint32()%39] + " " + intransitiveVerb[rand.Uint32()%17] + " " + preposition[rand.Uint32()%7] + " " + object[rand.Uint32()%17]
 	}
-
-	return sentence
 }
