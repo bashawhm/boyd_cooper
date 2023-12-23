@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-var searchesLock sync.RWMutex
+var searchesLock sync.Mutex
 var searches map[string]*Result
 
 // Result is a struct that holds the results of a search.
@@ -119,13 +119,13 @@ func newSearchLocked(s string, start int) *searchError {
 
 // Loop through all completed searches and consider adding the new quote to them
 func updateSearches(q string) {
-	searchesLock.RLock()
+	searchesLock.Lock()
 	for _, r := range searches {
 		if r.re.FindStringSubmatch(q) != nil {
 			r.quotes = append(r.quotes, len(quoteList)-1)
 		}
 	}
-	searchesLock.RUnlock()
+	searchesLock.Unlock()
 }
 
 // Starts a new search for every word found in the quote list

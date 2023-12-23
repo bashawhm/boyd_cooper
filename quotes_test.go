@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"math/rand"
 	"strings"
 	"testing"
@@ -9,8 +8,6 @@ import (
 )
 
 func TestLoadQuotes(t *testing.T) {
-	log.Println(quoteList)
-
 	// Define quotes
 	quotes := map[int]string{
 		0: "Be yourself; everyone else is already taken. - Oscar Wilde",
@@ -40,7 +37,7 @@ func TestLoadQuotes(t *testing.T) {
 	}
 }
 
-// writer satisfies io.Writer, stores whatever is written to it
+// writer satisfies io.Writer, stores the last thing written to it
 type writer struct {
 	Storage []byte
 }
