@@ -8,6 +8,8 @@ import (
 )
 
 func TestLoadQuotes(t *testing.T) {
+	t.Cleanup(clean)
+
 	// Define quotes
 	quotes := map[int]string{
 		0: "Be yourself; everyone else is already taken. - Oscar Wilde",
@@ -66,10 +68,11 @@ func TestWriteQuote(t *testing.T) {
 }
 
 func randomString(n int) string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	runes := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_+")
 	b := make([]rune, n)
 	for i := range b {
-		b[i] = runes[rand.Intn(len(runes))]
+		b[i] = runes[r.Intn(len(runes))]
 	}
 	return string(b)
 }

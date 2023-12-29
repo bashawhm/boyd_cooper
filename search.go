@@ -21,8 +21,9 @@ type Result struct {
 
 // Next returns the next quote in the search results.
 func (r *Result) Next() string {
+	// If the cached results have already been depleted, restart them from the beginning
 	if r.index >= len(r.quotes) {
-		return ""
+		r.index = 0
 	}
 	ret := quoteList[r.quotes[r.index]]
 	r.index++
@@ -45,11 +46,6 @@ func search(s string) (string, *searchError) {
 	r, ok := searches[s]
 	if ok {
 		log.Println("Returning cached result")
-
-		// If the cached results have already been depleted, restart them from the beginning
-		if r.index >= len(r.quotes) {
-			r.index = 0
-		}
 
 		ret := r.Next()
 		return ret, nil
