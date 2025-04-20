@@ -1,7 +1,7 @@
 # Builder image
-FROM golang:1.22-alpine as build
+FROM golang:1.24-alpine as build
 
-RUN mkdir /app 
+RUN mkdir /app
 COPY . /app
 WORKDIR /app
 RUN go build -v
