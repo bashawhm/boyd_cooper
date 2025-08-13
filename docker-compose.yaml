@@ -4,3 +4,4 @@ services:
     env_file: .env
     volumes:
       - ./quotes.txt:/app/quotes.txt
+    restart: unless-stopped
