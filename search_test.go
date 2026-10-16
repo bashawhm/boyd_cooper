@@ -80,7 +80,7 @@ func TestExhaust(t *testing.T) {
 		index: 0,
 	}
 
-	for i := 0; i < 16; i++ {
+	for range 16 {
 		if res := result.Next(); res == "" {
 			t.Errorf("error, exhausted searches do not restart")
 			t.FailNow()
@@ -92,7 +92,7 @@ func TestExhaust(t *testing.T) {
 func randomQuotes(num int) {
 	// Define quotes
 	var quotes []string
-	for i := 0; i < num; i++ {
+	for range num {
 		quotes = append(quotes, randomString(64))
 	}
 	// Load quoteList
@@ -103,7 +103,7 @@ func randomQuotes(num int) {
 func setupQuotes(quotes []string) {
 	// Build quotes into quotefile format
 	var quotestr string
-	for i := 0; i < len(quotes); i++ {
+	for i := range quotes {
 		quotestr += quotes[i]
 		if i+1 != len(quotes) {
 			quotestr += "\n"

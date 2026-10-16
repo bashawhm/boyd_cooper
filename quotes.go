@@ -15,6 +15,9 @@ func loadQuotes(input io.Reader) {
 	for scanner.Scan() {
 		quoteList = append(quoteList, scanner.Text())
 	}
+	if scanner.Err() != nil {
+		panic(scanner.Err())
+	}
 }
 
 // Writes a quote to an output stream

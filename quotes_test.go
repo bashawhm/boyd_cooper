@@ -52,7 +52,7 @@ func (w *writer) Write(p []byte) (n int, err error) {
 func TestWriteQuote(t *testing.T) {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	for i := 0; i < 25; i++ {
+	for range 25 {
 		// Generate random quote
 		quote := randomString(r.Intn(128))
 
